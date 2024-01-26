@@ -1,0 +1,12 @@
+{
+    "name": "com.haw2fregel.overdraw-checker",
+    "displayName": "OverdrawChecker",
+    "version": "1.0.0",
+    "unity": "2022.3",
+    "license": "The Unlicense",
+    "dependencies": {
+    },
+    "author": {
+      "name": "haw2fregel"
+    }
+  }
