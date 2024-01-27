@@ -20,7 +20,7 @@ namespace OverdrawChecker
         Vector2Int _screenRes;
         RenderTexture _rt;
         int count = 0;
-        const int DivCount = 8;
+        const int DivCount = 32;
         const int Interval = 10;
 
         void OnEnable()
