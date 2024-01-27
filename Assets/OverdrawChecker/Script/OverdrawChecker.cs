@@ -66,7 +66,7 @@ namespace OverdrawChecker
                 _cs.SetTexture(kernel, "_OverdrawTex", _rt);
                 _cs.SetInt("_DivCount", DivCount);
                 _cs.SetInt("_Count", (_rt.width / DivCount) * (_rt.height / DivCount));
-                _cs.SetVector("_Resolution", new Vector4(_rt.width, _rt.height, 0, 0));
+                _cs.SetVector("_Resolution", new Vector4(_rt.width, _rt.height, _rt.width / DivCount, _rt.height / DivCount));
 
                 _cs.Dispatch(kernel, DivCount, DivCount, 1);
 

@@ -5,17 +5,17 @@ Texture2D<float4> _OverdrawTex;
 
 int _DivCount;
 int _Count;
-uint2 _Resolution;
+uint4 _Resolution;
 
 [numthreads(1, 1, 1)]
 void CSMain (uint2 id : SV_GroupID)
 {
     uint result = 0;
-    uint2 offset = id * _Resolution + _Resolution * 0.5;
+    uint2 offset = id * _Resolution.zw + _Resolution.zw * 0.5;
 
-    for (int i = (int)(_Resolution.y * -0.5); i <= (int)(_Resolution.y * 0.5); i++)
+    for (int i = (int)(_Resolution.w * -0.5); i <= (int)(_Resolution.w * 0.5); i++)
     {
-        for (int j = (int)(_Resolution.x * -0.5); j <= (int)(_Resolution.x * 0.5); j++)
+        for (int j = (int)(_Resolution.z * -0.5); j <= (int)(_Resolution.z * 0.5); j++)
         {
             uint2 uv = offset + uint2(j, i);
             result += (int)(_OverdrawTex[uv].r * 100);
