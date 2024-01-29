@@ -21,7 +21,7 @@ RenderPipelineAssetにRendererDataを2つ登録します\
 
 ※この時Indexもスクショと同じになるようにしてください。\
 ※Indexの変更が難しい場合下記を試してください。\
-OverdrawChecker.prefab内のCameraのRendererDataを②で登録したものに変更します。\
+OverdrawChecker.prefab内のCameraのRendererDataを登録したものに変更します。\
 Package内のプレハブは直接編集できないので、Assets内に複製しそちらを利用してください。
 
 ![image](https://github.com/haw2fregel/OverdrawChecker/assets/143925343/6f48e511-f68d-4a22-b9aa-c192d92652bf)
