@@ -23,6 +23,15 @@ namespace OverdrawChecker
         const int DivCount = 32;
         const int Interval = 10;
 
+        readonly int ResultPropertyID = Shader.PropertyToID("_Result");
+        readonly int OverdrawTexPropertyID = Shader.PropertyToID("_OverdrawTex");
+        readonly int DivCountPropertyID = Shader.PropertyToID("_DivCount");
+        readonly int CountPropertyID = Shader.PropertyToID("_Count");
+        readonly int ResolutionPropertyID = Shader.PropertyToID("_Resolution");
+        int kernel;
+        ComputeBuffer buffer;
+        int[] datas;
+
         void OnEnable()
         {
 #if UNITY_EDITOR
@@ -46,42 +55,40 @@ namespace OverdrawChecker
             _camera.farClipPlane = mainCam.farClipPlane;
             _camera.fieldOfView = mainCam.fieldOfView;
             _camera.orthographicSize = mainCam.orthographicSize;
+
+            kernel = _cs.FindKernel("CSMain");
+            datas = new int[DivCount * DivCount];
+            buffer = new ComputeBuffer(DivCount * DivCount, sizeof(int));
+
+            _cs.SetBuffer(kernel, ResultPropertyID, buffer);
+            _cs.SetTexture(kernel, OverdrawTexPropertyID, _rt);
+            _cs.SetInt(DivCountPropertyID, DivCount);
+            _cs.SetInt(CountPropertyID, (_rt.width / DivCount) * (_rt.height / DivCount));
+            _cs.SetVector(ResolutionPropertyID, new Vector4(_rt.width, _rt.height, _rt.width / DivCount, _rt.height / DivCount));
         }
 
         void OnDisable()
         {
             _rt.Release();
+            buffer.Release();
         }
 
         void Update()
         {
             if (count > Interval)
             {
-                int num = DivCount * DivCount;
-                ComputeBuffer buffer = new ComputeBuffer(num, sizeof(int));
-
-                int kernel = _cs.FindKernel("CSMain");
-
-                _cs.SetBuffer(kernel, "_Result", buffer);
-                _cs.SetTexture(kernel, "_OverdrawTex", _rt);
-                _cs.SetInt("_DivCount", DivCount);
-                _cs.SetInt("_Count", (_rt.width / DivCount) * (_rt.height / DivCount));
-                _cs.SetVector("_Resolution", new Vector4(_rt.width, _rt.height, _rt.width / DivCount, _rt.height / DivCount));
-
                 _cs.Dispatch(kernel, DivCount, DivCount, 1);
 
-                int[] datas = new int[num];
                 buffer.GetData(datas);
-                buffer.Release();
-
+                
                 int overdrawValue = 0;
                 foreach (var data in datas)
                 {
                     overdrawValue += data;
                 }
-                overdrawValue = (int)Mathf.Ceil((float)overdrawValue / (float)num);
+                overdrawValue = (int)Mathf.Ceil((float)overdrawValue / (float)(DivCount * DivCount));
 
-                _text.text = "Overdraw : " + overdrawValue + "%";
+                _text.text = $"Overdraw : {overdrawValue.ToString()}%";
                 if (overdrawValue > _borderCount)
                 {
                     _text.color = new Color(1, 0, 0, 1);
@@ -90,6 +97,8 @@ namespace OverdrawChecker
                 {
                     _text.color = new Color(1, 1, 1, 1);
                 }
+
+                count = 0;
 
             }
             else
