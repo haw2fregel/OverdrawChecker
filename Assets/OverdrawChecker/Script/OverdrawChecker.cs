@@ -40,7 +40,7 @@ namespace OverdrawChecker
 #else
             _screenRes = new Vector2Int(Screen.width, Screen.height);
 #endif
-            _rt = new RenderTexture(_screenRes.x, _screenRes.y, 0, RenderTextureFormat.RFloat);
+            _rt = new RenderTexture(_screenRes.x, _screenRes.y, 16, RenderTextureFormat.RFloat);
             _camera.targetTexture = _rt;
             _rawImage.texture = _rt;
             _rawImage.enabled = true;
