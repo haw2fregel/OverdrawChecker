@@ -19,8 +19,9 @@ namespace OverdrawChecker
         [SerializeField] ComputeShader _cs;
         Vector2Int _screenRes;
         RenderTexture _rt;
+        Texture2D _tex;
         int count = 0;
-        const int DivCount = 32;
+        const int DivCount = 8;
         const int Interval = 10;
 
         readonly int ResultPropertyID = Shader.PropertyToID("_Result");
@@ -40,7 +41,8 @@ namespace OverdrawChecker
 #else
             _screenRes = new Vector2Int(Screen.width, Screen.height);
 #endif
-            _rt = new RenderTexture(_screenRes.x, _screenRes.y, 16, RenderTextureFormat.RFloat);
+            _rt = new RenderTexture(_screenRes.x / DivCount, _screenRes.y / DivCount, 16, RenderTextureFormat.RFloat);
+            _tex = new Texture2D(_rt.width, _rt.height);
             _camera.targetTexture = _rt;
             _rawImage.texture = _rt;
             _rawImage.enabled = true;
@@ -56,6 +58,7 @@ namespace OverdrawChecker
             _camera.fieldOfView = mainCam.fieldOfView;
             _camera.orthographicSize = mainCam.orthographicSize;
 
+            /*
             kernel = _cs.FindKernel("CSMain");
             datas = new int[DivCount * DivCount];
             buffer = new ComputeBuffer(DivCount * DivCount, sizeof(int));
@@ -65,28 +68,39 @@ namespace OverdrawChecker
             _cs.SetInt(DivCountPropertyID, DivCount);
             _cs.SetInt(CountPropertyID, (_rt.width / DivCount) * (_rt.height / DivCount));
             _cs.SetVector(ResolutionPropertyID, new Vector4(_rt.width, _rt.height, _rt.width / DivCount, _rt.height / DivCount));
+            */
         }
 
         void OnDisable()
         {
             _rt.Release();
-            buffer.Release();
+            Destroy(_tex);
+            //buffer.Release();
         }
 
         void Update()
         {
             if (count > Interval)
             {
+                /*
                 _cs.Dispatch(kernel, DivCount, DivCount, 1);
 
                 buffer.GetData(datas);
+                */
+
+                var currentRT = RenderTexture.active;
+                RenderTexture.active = _rt;
+                _tex.ReadPixels(new Rect(0, 0, _rt.width, _rt.height), 0, 0);
+                _tex.Apply();
+                RenderTexture.active = currentRT;
+                var colors = _tex.GetPixels();
                 
                 int overdrawValue = 0;
-                foreach (var data in datas)
+                foreach (var data in colors)
                 {
-                    overdrawValue += data;
+                    overdrawValue += (int)(data.r * 10000f);
                 }
-                overdrawValue = (int)Mathf.Ceil((float)overdrawValue / (float)(DivCount * DivCount));
+                overdrawValue = (int)Mathf.Ceil((float)overdrawValue / (float)(_rt.width * _rt.height));
 
                 _text.text = $"Overdraw : {overdrawValue.ToString()}%";
                 if (overdrawValue > _borderCount)
