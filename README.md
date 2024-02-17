@@ -11,6 +11,9 @@ UnityのPackageManagerを開き\
 以下URLを入力してインストールします。\
 ・https://github.com/haw2fregel/OverdrawChecker.git?path=/Assets/OverdrawChecker
 
+動作しない場合はこちら（Mac）\
+・https://github.com/haw2fregel/OverdrawChecker.git?path=/Assets/OverdrawChecker#unuse_cs
+
 ![image](https://github.com/haw2fregel/OverdrawChecker/assets/143925343/2aae7416-cfe1-4795-b3c0-4591a9e84aed)
 
 ### ②Renderer Data の登録
